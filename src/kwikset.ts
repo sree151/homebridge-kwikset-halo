@@ -10,7 +10,7 @@ import { Amplify, Auth } from 'aws-amplify';
 import * as constants from './const';
 import Express from 'express';
 import EventEmitter from 'events';
-import ip from 'ip';
+import os from 'os';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import { INDEXHTML, SUCCESSHTML } from './statichtml';
@@ -32,6 +32,20 @@ Amplify.configure({
 });
 
 let idToken: string | undefined;
+
+function getHostIPAddress() {
+  const networkInterfaces = os.networkInterfaces();
+  for (const name of Object.keys(networkInterfaces)) {
+    for (const net of networkInterfaces[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return null;
+}
+
+const hostIP = getHostIPAddress();
 
 const getCredentialsFromSession = async (user): Promise<Credentials | null> => {
   return new Promise<Credentials | null>((resolve) => {
@@ -159,7 +173,7 @@ export const kwiksetLogin = async (config, log, api) => {
       });
 
       server = app.listen(config.mfaPort, () => {
-        log.info(`MFA server listening on http://${ip.address()}:${config.mfaPort}`);
+        log.info(`MFA server listening on http://${hostIP}:${config.mfaPort}`);
       });
 
       let codeVerified = false;
