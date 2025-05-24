@@ -10,7 +10,7 @@ import { KwiksetHaloPlatform } from './platform';
  */
 export class KwiksetHaloAccessory {
   public service: Service;
-  public batteryservice: Service;
+  public battery: Service;
   private batterylevel;
 
   /**
@@ -55,9 +55,9 @@ export class KwiksetHaloAccessory {
       .getCharacteristic(this.platform.Characteristic.LockTargetState)
       .onSet(this.setShouldLock.bind(this));
 
-    // get the Battery service if it exists, otherwise create a new Battery service
+    // get the battery service if it exists, otherwise create a new battery service
     // you can create multiple services for each accessory
-    this.batteryservice =
+    this.battery =
       this.accessory.getService(this.platform.Service.Battery) ||
       this.accessory.addService(this.platform.Service.Battery);
 
@@ -117,17 +117,17 @@ export class KwiksetHaloAccessory {
         this.lockStates.locked = lockStatus;
 
         this.batterylevel = lock.batterypercentage;
-        this.batteryservice.updateCharacteristic(
+        this.battery.updateCharacteristic(
           this.platform.Characteristic.BatteryLevel,
           this.batterylevel,
         );
         if (this.batterylevel <= LOW_BATTERY_LEVEL) {
-          this.batteryservice.updateCharacteristic(
+          this.battery.updateCharacteristic(
             this.platform.Characteristic.StatusLowBattery,
             this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW,
           );
         } else {
-          this.batteryservice.updateCharacteristic(
+          this.battery.updateCharacteristic(
             this.platform.Characteristic.StatusLowBattery,
             this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL,
           );
